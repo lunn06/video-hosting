@@ -1,7 +1,14 @@
 package app
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/lunn06/video-hosting/internal/services"
+)
 
 func Run() {
-	fmt.Println("Run initialization whole app")
+	r := services.SetupRouter()
+	err := r.Run(":8081")
+	if err != nil {
+		fmt.Println(err)
+	}
 }
