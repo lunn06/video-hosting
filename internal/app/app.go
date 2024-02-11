@@ -7,8 +7,9 @@ import (
 
 func Run() {
 	r := services.SetupRouter()
-	err := r.Run(":8081")
+	err := r.Run(":8080")
 	if err != nil {
 		fmt.Println(err)
 	}
+
 }
