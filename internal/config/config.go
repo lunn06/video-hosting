@@ -6,18 +6,15 @@ import (
 	"os"
 )
 
-//TODO add application logic
-
 type Config struct {
 	HTTPServer `yaml:"http_server"`
 }
 
 type HTTPServer struct {
-	Address string `yaml:"address" env-default:"localhost:8080"`
+	Address string `yaml:"address" env-default:"127.0.0.1:8080"`
 }
 
-func MustLoad() *Config {
-	configPath := "configs/local.yaml"
+func MustLoad(configPath string) *Config {
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("config file does not exist: %s", configPath)
 	}
