@@ -1,0 +1,8 @@
+http_server:
+  address: "127.0.0.1:80"
+database:
+  address: "pgsql.com:5432"
+  user: "db_user"
+  name: "db_name"
+  password: "db_password"
+  ssl_mode: "disable"
