@@ -17,7 +17,7 @@ type User struct {
 	Id int `db:"id"`
 }
 
-func MustCreateDB(config *config.Config) *sqlx.DB {
+func MustCreate(config *config.Config) *sqlx.DB {
 	// postgresql://db_user:db_password@pgadmin.dnc-check234.freemyip.com:5432/video-hosting
 	dbConnArg := fmt.Sprintf(
 		"postgresql://%s:%s@%s/%s",
