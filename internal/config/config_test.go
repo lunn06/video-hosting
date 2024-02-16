@@ -17,16 +17,7 @@ func TestMustLoad(t *testing.T) {
 		{
 			"config.MustLoad() test",
 			args{"../../configs/main.yaml"},
-			&Config{
-				HTTPServer{"127.0.0.1:8080"},
-				Database{
-					"pgadmin.dnc-check234.freemyip.com:5432",
-					"artem_egor",
-					"video-hosting",
-					"321123321123EA",
-					"disable",
-				},
-			},
+			&Config{HTTPServer{"127.0.0.1:8080"}},
 		},
 	}
 	for _, tt := range tests {
