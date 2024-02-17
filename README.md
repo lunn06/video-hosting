@@ -1,2 +1,7 @@
 # Video-hosting PROJECT
-Сейчас проект пуст, но это ненадолго
+
+## Launch with Docker
+```shell
+$ docker build -f build/Dockerfile --tag "video-hosting" .
+$ docker run -d -p 8080:8080 "video-hosting"
+```
