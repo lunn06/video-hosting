@@ -1,7 +1,7 @@
 # Video-hosting PROJECT
 
-## Launch with Docker
+## Launch with Docker Compose
+
 ```shell
-$ docker build -f build/Dockerfile --tag "video-hosting" .
-$ docker run -d -p 8080:8080 "video-hosting"
+$ docker compose -f deployments/docker-compose.yaml up -d
 ```

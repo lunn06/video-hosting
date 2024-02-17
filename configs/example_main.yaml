@@ -1,5 +1,6 @@
 http_server:
-  address: "127.0.0.1:80"
+  address: "127.0.0.1"
+  post: "80"
 database:
   address: "pgsql.com:5432"
   user: "db_user"
