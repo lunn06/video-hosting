@@ -1,2 +1,7 @@
 # Video-hosting PROJECT
-Сейчас проект пуст, но это ненадолго
+
+## Launch with Docker Compose
+
+```shell
+$ docker compose -f deployments/docker-compose.yaml up -d
+```

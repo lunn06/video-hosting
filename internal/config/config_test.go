@@ -16,8 +16,17 @@ func TestMustLoad(t *testing.T) {
 	}{
 		{
 			"config.MustLoad() test",
-			args{"../../configs/main.yaml"},
-			&Config{HTTPServer{"127.0.0.1:8080"}},
+			args{"../../configs/example_main.yaml"},
+			&Config{
+				HTTPServer{"127.0.0.1", "8080"},
+				Database{
+					"pgsql.com:5432",
+					"db_user",
+					"db_name",
+					"db_password",
+					"disable",
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
