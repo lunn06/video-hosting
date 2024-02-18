@@ -2,10 +2,11 @@ package database
 
 import (
 	"fmt"
+	"log"
+
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/lunn06/video-hosting/internal/config"
-	"log"
 )
 
 var schema = `

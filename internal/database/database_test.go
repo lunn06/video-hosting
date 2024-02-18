@@ -1,14 +1,15 @@
 package database
 
 import (
-	_ "github.com/jackc/pgx/stdlib"
-	"github.com/lunn06/video-hosting/internal/config"
 	"reflect"
 	"testing"
+
+	_ "github.com/jackc/pgx/stdlib"
+	"github.com/lunn06/video-hosting/internal/config"
 )
 
 func TestMustCreate(t *testing.T) {
-	check := 99999
+	check := -1
 	want := User{Id: check}
 
 	cfg := config.MustLoad("../../configs/main.yaml")
