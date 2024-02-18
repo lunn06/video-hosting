@@ -43,3 +43,30 @@ func TestMustCreate(t *testing.T) {
 		t.Errorf("DELETE Error: %v. FIX THE DB MANUALY!", err)
 	}
 }
+
+func Test_getPgAddress(t *testing.T) {
+
+	cfg := config.MustLoad("../../configs/example_main.yaml")
+
+	type args struct {
+		cfg *config.Config
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			"getPgAdressTest",
+			args{cfg},
+			"postgresql://db_user:db_password@pgsql.com:5432/db_name",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getPgAddress(tt.args.cfg); got != tt.want {
+				t.Errorf("getPgAddress() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
