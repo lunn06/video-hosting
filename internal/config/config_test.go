@@ -12,12 +12,12 @@ func TestMustLoad(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *Config
+		want Config
 	}{
 		{
 			"config.MustLoad() test",
 			args{"../../configs/example_main.yaml"},
-			&Config{
+			Config{
 				HTTPServer{"127.0.0.1", "8080"},
 				Database{
 					"pgsql.com:5432",

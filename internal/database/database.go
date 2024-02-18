@@ -18,7 +18,7 @@ type User struct {
 	Id int `db:"id"`
 }
 
-func MustCreate(cfg *config.Config) *sqlx.DB {
+func MustCreate(cfg config.Config) *sqlx.DB {
 	dbConnArg := getPgAddress(cfg)
 
 	db, err := sqlx.Connect("pgx", dbConnArg)
@@ -31,7 +31,7 @@ func MustCreate(cfg *config.Config) *sqlx.DB {
 	return db
 }
 
-func getPgAddress(cfg *config.Config) string {
+func getPgAddress(cfg config.Config) string {
 	// postgresql://db_user:db_password@pgadmin.dnc-check234.freemyip.com:5432/video-hosting
 	return fmt.Sprintf(
 		"postgresql://%s:%s@%s/%s",

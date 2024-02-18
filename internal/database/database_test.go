@@ -45,11 +45,10 @@ func TestMustCreate(t *testing.T) {
 }
 
 func Test_getPgAddress(t *testing.T) {
-
 	cfg := config.MustLoad("../../configs/example_main.yaml")
 
 	type args struct {
-		cfg *config.Config
+		cfg config.Config
 	}
 	tests := []struct {
 		name string
