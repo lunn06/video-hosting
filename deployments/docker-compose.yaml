@@ -1,0 +1,9 @@
+services:
+  video-hosting:
+    build:
+      context: ../
+      dockerfile: build/Dockerfile
+    environment:
+      - GIN_MODE=debug
+    ports:
+      - "9001:8080"
