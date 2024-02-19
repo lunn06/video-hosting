@@ -1,9 +1,10 @@
 package app
 
 import (
+	"log"
+
 	"github.com/lunn06/video-hosting/internal/config"
 	"github.com/lunn06/video-hosting/internal/services"
-	"log"
 )
 
 func Run() {

@@ -25,7 +25,7 @@ type Database struct {
 	SSLMode  string `yaml:"ssl_mode"`
 }
 
-func MustLoad(configPath string) *Config {
+func MustLoad(configPath string) Config {
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("config file does not exist: %s", configPath)
 	}
@@ -35,5 +35,5 @@ func MustLoad(configPath string) *Config {
 		log.Fatalf("cannot read config: %s", err)
 	}
 
-	return &cfg
+	return cfg
 }
