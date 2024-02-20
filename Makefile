@@ -15,7 +15,7 @@ test: vet
 	@go test ./...
 .PHONY:vet
 
-build target: vet
+build: vet
 	@go build -o video-hosting cmd/app/main.go
 .PHONY:build
 

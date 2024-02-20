@@ -2,14 +2,12 @@ package services
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/lunn06/video-hosting/internal/transport/rest"
 )
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(200, "pong")
-	})
+	r.GET("/ping", rest.Ping)
 
 	return r
 }
