@@ -11,11 +11,17 @@ import (
 
 var schema = `
 CREATE TABLE IF NOT EXISTS users (
-	id INTEGER UNIQUE
+	id SERIAL UNIQUE,
+	email TEXT UNIQUE,
+	channel_name TEXT,
+	password TEXT
 );`
 
 type User struct {
-	Id int `db:"id"`
+	Id          int    `db:"id"`
+	Email       string `db:"email"`
+	ChannelName string `db:"channel_name"`
+	Password    string `db:"password"`
 }
 
 func MustCreate(cfg config.Config) *sqlx.DB {
