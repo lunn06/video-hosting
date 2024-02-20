@@ -20,5 +20,9 @@ build target: vet
 .PHONY:build
 
 run: vet
-	go run cmd/app/main.go
+	@go run cmd/app/main.go
 .PHONY:run
+
+deploy:
+	@docker compose -f deployments/docker-compose.yaml up -d
+.PHONY:deploy
