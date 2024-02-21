@@ -7,7 +7,7 @@ paths:
       - application/json
       description: do ping
       produces:
-      - text/html
+      - text/plain
       responses:
         "200":
           description: OK

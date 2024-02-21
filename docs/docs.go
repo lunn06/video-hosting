@@ -22,7 +22,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "produces": [
-                    "text/html"
+                    "text/plain"
                 ],
                 "tags": [
                     "example"

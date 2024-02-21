@@ -14,7 +14,7 @@ import (
 // @Description do ping
 // @Tags example
 // @Accept json
-// @Produce html
+// @Produce plain
 // @Success 200 html pong
 // @Router /ping [get]
 func Ping(c *gin.Context) {
