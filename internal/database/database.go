@@ -20,7 +20,7 @@ func MustCreate(cfg config.Config) *sqlx.DB {
 		log.Fatal(err)
 	}
 
-	db.MustExec(models.SchemaForUsers)
+	db.MustExec(models.Schema)
 
 	return db
 }
