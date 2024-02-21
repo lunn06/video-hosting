@@ -10,6 +10,8 @@ import (
 	"github.com/lunn06/video-hosting/internal/models"
 )
 
+var DB *sqlx.DB
+
 func MustCreate(cfg config.Config) *sqlx.DB {
 	dbConnArg := getPgAddress(cfg)
 
