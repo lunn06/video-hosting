@@ -7,16 +7,10 @@ import (
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/lunn06/video-hosting/internal/config"
+	"github.com/lunn06/video-hosting/internal/models"
 )
 
-var schema = `
-CREATE TABLE IF NOT EXISTS users (
-	id INTEGER UNIQUE
-);`
-
-type User struct {
-	Id int `db:"id"`
-}
+var DB *sqlx.DB
 
 func MustCreate(cfg config.Config) *sqlx.DB {
 	dbConnArg := getPgAddress(cfg)
@@ -26,7 +20,7 @@ func MustCreate(cfg config.Config) *sqlx.DB {
 		log.Fatal(err)
 	}
 
-	db.MustExec(schema)
+	db.MustExec(models.SchemaForUsers)
 
 	return db
 }

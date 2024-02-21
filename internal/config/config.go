@@ -7,6 +7,8 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+var CFG Config
+
 type Config struct {
 	HTTPServer `yaml:"http_server"`
 	Database   `yaml:"database"`
