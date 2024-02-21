@@ -15,7 +15,7 @@ import (
 // @Tags example
 // @Accept json
 // @Produce plain
-// @Success 200 html pong
+// @Success 200 plain pong
 // @Router /ping [get]
 func Ping(c *gin.Context) {
 	c.String(http.StatusOK, "pong")

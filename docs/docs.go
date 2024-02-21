@@ -32,7 +32,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "html"
+                            "type": "plain"
                         }
                     }
                 }

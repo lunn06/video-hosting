@@ -12,7 +12,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: html
+            type: plain
       summary: ping example
       tags:
       - example
