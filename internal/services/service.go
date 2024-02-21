@@ -9,5 +9,7 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.GET("/ping", rest.Ping)
 
+	SetupDocs(r)
+
 	return r
 }
