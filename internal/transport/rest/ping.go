@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @BasePath /api/v1
+// @BasePath /
 
 // Ping godoc
 // @Summary ping example
@@ -14,8 +14,8 @@ import (
 // @Description do ping
 // @Tags example
 // @Accept json
-// @Produce html
-// @Success 200 html pong
+// @Produce plain
+// @Success 200 plain pong
 // @Router /ping [get]
 func Ping(c *gin.Context) {
 	c.String(http.StatusOK, "pong")

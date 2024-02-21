@@ -7,12 +7,12 @@ paths:
       - application/json
       description: do ping
       produces:
-      - text/html
+      - text/plain
       responses:
         "200":
           description: OK
           schema:
-            type: html
+            type: plain
       summary: ping example
       tags:
       - example

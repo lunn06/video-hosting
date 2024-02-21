@@ -7,6 +7,7 @@ RUN go mod download
 
 COPY cmd/ ./cmd
 COPY internal/ ./internal
+COPY docs/ ./docs
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux

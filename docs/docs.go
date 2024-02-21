@@ -22,7 +22,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "produces": [
-                    "text/html"
+                    "text/plain"
                 ],
                 "tags": [
                     "example"
@@ -32,7 +32,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "html"
+                            "type": "plain"
                         }
                     }
                 }
