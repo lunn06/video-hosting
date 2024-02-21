@@ -7,22 +7,8 @@ import (
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/lunn06/video-hosting/internal/config"
+	"github.com/lunn06/video-hosting/internal/models"
 )
-
-var schema = `
-CREATE TABLE IF NOT EXISTS users (
-	id SERIAL UNIQUE,
-	email TEXT UNIQUE,
-	channel_name TEXT,
-	password TEXT
-);`
-
-type User struct {
-	Id          int    `db:"id"`
-	Email       string `db:"email"`
-	ChannelName string `db:"channel_name"`
-	Password    string `db:"password"`
-}
 
 func MustCreate(cfg config.Config) *sqlx.DB {
 	dbConnArg := getPgAddress(cfg)
@@ -32,7 +18,7 @@ func MustCreate(cfg config.Config) *sqlx.DB {
 		log.Fatal(err)
 	}
 
-	db.MustExec(schema)
+	db.MustExec(models.SchemaForUsers)
 
 	return db
 }
