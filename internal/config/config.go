@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/lunn06/video-hosting/internal/models"
 )
 
 var CFG Config
@@ -27,6 +28,10 @@ type Database struct {
 	SSLMode  string `yaml:"ssl_mode"`
 }
 
+type DatabaseDefaults struct {
+	Roles []models.Role
+}
+
 func MustLoad(configPath string) Config {
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("config file does not exist: %s", configPath)
@@ -38,4 +43,17 @@ func MustLoad(configPath string) Config {
 	}
 
 	return cfg
+}
+
+func MustLoadDatabaseDefaults(configPath string) DatabaseDefaults {
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		log.Fatalf("config file does not exist: %s", configPath)
+	}
+	var defaults DatabaseDefaults
+
+	if err := cleanenv.ReadConfig(configPath, &defaults); err != nil {
+		log.Fatalf("cannot read config: %s", err)
+	}
+
+	return defaults
 }

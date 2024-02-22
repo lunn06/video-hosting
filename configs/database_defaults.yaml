@@ -1,0 +1,16 @@
+roles:
+  - user:
+    id: 1
+    name: user
+    can_remove_users: false
+    can_remove_others_videos: false
+  - moderator:
+    id: 2
+    name: moderator
+    can_remove_users: false
+    can_remove_others_videos: true
+  - admin:
+    id: 3
+    name: admin
+    can_remove_users: true
+    can_remove_others_videos: true

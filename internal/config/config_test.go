@@ -37,3 +37,33 @@ func TestMustLoad(t *testing.T) {
 		})
 	}
 }
+
+func TestMustLoadDatabaseDefaults(t *testing.T) {
+	type args struct {
+		configPath string
+	}
+	tests := []struct {
+		name string
+		args args
+		want DatabaseDefaults
+	}{
+		{
+			"MustLoadDatabaseDefaults() Test",
+			args{"../../configs/database_defaults.yaml"},
+			DatabaseDefaults{
+				[]Role{
+					{1, "user", false, false},
+					{2, "moderator", false, true},
+					{3, "admin", true, true},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := MustLoadDatabaseDefaults(tt.args.configPath); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MustLoadDatabaseDefaults() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
