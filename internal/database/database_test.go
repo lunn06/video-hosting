@@ -9,6 +9,8 @@ import (
 	"github.com/lunn06/video-hosting/internal/models"
 )
 
+//TODO: переписать тесты, сделать тесты для всех таблицы
+
 func TestMustCreate(t *testing.T) {
 	checkID := "-2"
 	checkEmail := "check@tt.com"
