@@ -5,8 +5,3 @@ type BodyForRegistration struct {
 	ChannelName string
 	Password    string
 }
-
-type BodyForAuthorization struct {
-	Email    string
-	Password string
-}
