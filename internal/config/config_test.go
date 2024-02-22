@@ -3,6 +3,8 @@ package config
 import (
 	"reflect"
 	"testing"
+
+	"github.com/lunn06/video-hosting/internal/models"
 )
 
 func TestMustLoad(t *testing.T) {
@@ -51,7 +53,7 @@ func TestMustLoadDatabaseDefaults(t *testing.T) {
 			"MustLoadDatabaseDefaults() Test",
 			args{"../../configs/database_defaults.yaml"},
 			DatabaseDefaults{
-				[]Role{
+				[]models.Role{
 					{1, "user", false, false},
 					{2, "moderator", false, true},
 					{3, "admin", true, true},
