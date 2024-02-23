@@ -1,6 +1,48 @@
+definitions:
+  models.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.RegisterRequest:
+    properties:
+      channel_name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+    type: object
 info:
   contact: {}
+  description: API Server for video-hosting application
+  title: Video-hosting API
+  version: "0.1"
 paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: accepts json sent by the user as input and authorize it
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Authorization was successful'
+        "400":
+          description: Bad Request
+      summary: авторизирует пользователя
+      tags:
+      - authorization
   /ping:
     get:
       consumes:
@@ -16,4 +58,26 @@ paths:
       summary: ping example
       tags:
       - example
+  /registration:
+    post:
+      consumes:
+      - application/json
+      description: accepts json sent by the user as input and registers it
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Registration was successful'
+        "400":
+          description: Bad Request
+      summary: registers a user
+      tags:
+      - registration
 swagger: "2.0"

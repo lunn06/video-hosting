@@ -9,17 +9,17 @@ lint: fmt
 
 vet: lint
 	@go vet ./...
-.PHONY:lint
+.PHONY:vet
 
 test: vet
 	@go test ./...
 .PHONY:vet
 
-build: generate-docs
+build: swagger
 	@go build -o video-hosting cmd/app/main.go
 .PHONY:build
 
-run: generate-docs
+run: swagger
 	@go run cmd/app/main.go
 .PHONY:run
 

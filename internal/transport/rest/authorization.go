@@ -12,6 +12,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// @BasePath /
+
+// Authorization godoc
+// @Summary авторизирует пользователя
+// @Schemes application/json
+// @Description accepts json sent by the user as input and authorize it
+// @Tags authorization
+// @Accept json
+// @Produce json
+// @Param input body models.LoginRequest true "account info"
+// @Success 200 "message: Authorization was successful"
+// @Failure 400
+// @Router /login [post]
 func Authorization(c *gin.Context) {
 	body := models.LoginRequest{}
 	if c.Bind(&body) != nil {
@@ -20,12 +33,14 @@ func Authorization(c *gin.Context) {
 		})
 		return
 	}
-	if len(body.Email) > 255 && len(body.Email) > 0 {
+	if len(body.Email) > 255 || body.Email == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Filed create email, because it exceeds the character limit or backwards",
+			// неправильно набран email
+			"error": "Email entered incorrectly, because it exceeds the character limit or backwards",
 		})
+		return
 	}
-	if len(body.Password) > 255 && len(body.Password) > 0 {
+	if len(body.Password) > 255 || body.Password == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid password size",
 		})
@@ -59,12 +74,20 @@ func Authorization(c *gin.Context) {
 		return
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization",
+	c.SetCookie(
+		// cookie name
+		"Authorization",
+		// cookie value
 		t,
+		// cookie lifetime
 		3600*24*30,
+		// path on the server to which the cookies are applied, path applies to the current one
 		"",
+		// domain for which cookies are valid are applied to the current one
 		"",
+		// cookies are sent via http
 		false,
+		// accessible only to server requests and not accessible to JS reading and modification
 		true)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Authorization was successful",

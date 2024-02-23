@@ -11,6 +11,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// @BasePath /
+
+// Registration godoc
+// @Summary registers a user
+// @Schemes application/json
+// @Description accepts json sent by the user as input and registers it
+// @Tags registration
+// @Accept json
+// @Produce json
+// @Param input body models.RegisterRequest true "account info"
+// @Success 200 "message: Registration was successful"
+// @Failure 400
+// @Router /registration [post]
 func Registration(c *gin.Context) {
 	body := models.RegisterRequest{}
 	if c.Bind(&body) != nil {
@@ -19,26 +32,30 @@ func Registration(c *gin.Context) {
 		})
 		return
 	}
-	if len(body.Email) > 255 && len(body.Email) > 0 {
+	if len(body.Email) > 255 || body.Email == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Filed create email, because it exceeds the character limit or backwards",
 		})
+		return
 	}
-	if len(body.ChannelName) > 255 && len(body.ChannelName) > 0 {
+	if len(body.ChannelName) > 255 || body.ChannelName == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Filed create channel_name, because it exceeds the character limit or backwards",
 		})
+		return
 	}
-	if len(body.Password) > 255 && len(body.Password) > 0 {
+	if len(body.Password) > 255 || body.Password == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Filed create password, because it exceeds the character limit or backwards",
 		})
+		return
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to hash password",
 		})
+		return
 	}
 
 	id := uuid.New().String()
@@ -59,6 +76,6 @@ func Registration(c *gin.Context) {
 	}
 	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Congratulations",
+		"message": "Registration was successful",
 	})
 }
