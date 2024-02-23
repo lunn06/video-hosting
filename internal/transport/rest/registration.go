@@ -12,21 +12,26 @@ import (
 )
 
 func Registration(c *gin.Context) {
-	body := models.RegistrationRequest{}
+	body := models.RegisterRequest{}
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
 		})
 		return
 	}
-	if len(body.ChannelName) > 255 {
+	if len(body.Email) > 255 && len(body.Email) > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Filed create ChannelName, because it exceeds the character limit",
+			"error": "Filed create email, because it exceeds the character limit or backwards",
 		})
 	}
-	if len(body.Password) > 255 {
+	if len(body.ChannelName) > 255 && len(body.ChannelName) > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Filed create password, because it exceeds the character limit",
+			"error": "Filed create channel_name, because it exceeds the character limit or backwards",
+		})
+	}
+	if len(body.Password) > 255 && len(body.Password) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Filed create password, because it exceeds the character limit or backwards",
 		})
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)

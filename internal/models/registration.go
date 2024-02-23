@@ -1,7 +1,7 @@
 package models
 
-type RegistrationRequest struct {
-	Email       string
-	ChannelName string
-	Password    string
+type RegisterRequest struct {
+	Email       string `json:"email"`
+	ChannelName string `json:"channel_name"`
+	Password    string `json:"password"`
 }
