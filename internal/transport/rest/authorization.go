@@ -20,7 +20,12 @@ func Authorization(c *gin.Context) {
 		})
 		return
 	}
-	if len(body.Password) > 255 {
+	if len(body.Email) > 255 && len(body.Email) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Filed create email, because it exceeds the character limit or backwards",
+		})
+	}
+	if len(body.Password) > 255 && len(body.Password) > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid password size",
 		})
