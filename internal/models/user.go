@@ -9,5 +9,5 @@ type User struct {
 	Email            string    `db:"email"`
 	ChannelName      string    `db:"channel_name"`
 	Password         string    `db:"password"`
-	RegistrationTime time.Time `db:"data_reg"`
+	RegistrationTime time.Time `db:"registration_time"`
 }

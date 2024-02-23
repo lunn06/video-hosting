@@ -1,6 +1,6 @@
 package models
 
-type BodyForRegistration struct {
+type RegistrationRequest struct {
 	Email       string
 	ChannelName string
 	Password    string

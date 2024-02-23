@@ -12,7 +12,7 @@ import (
 )
 
 func Registration(c *gin.Context) {
-	body := models.BodyForRegistration{}
+	body := models.RegistrationRequest{}
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
