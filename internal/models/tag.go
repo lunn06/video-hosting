@@ -1,6 +1,6 @@
 package models
 
 type Tag struct {
-	Id   uint   `db:"id"`
+	Id   uint32 `db:"id"`
 	Name string `db:"name"`
 }

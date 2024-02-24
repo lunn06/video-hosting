@@ -32,6 +32,10 @@ type DatabaseDefaults struct {
 	Roles []models.Role
 }
 
+func Init() {
+	CFG = MustLoad("configs/main.yaml")
+}
+
 func MustLoad(configPath string) Config {
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("config file does not exist: %s", configPath)
@@ -49,10 +53,11 @@ func MustLoadDatabaseDefaults(configPath string) DatabaseDefaults {
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("config file does not exist: %s", configPath)
 	}
+
 	var defaults DatabaseDefaults
 
 	if err := cleanenv.ReadConfig(configPath, &defaults); err != nil {
-		log.Fatalf("cannot read config: %s", err)
+		log.Fatalf("MustLoadDatabaseDefaults() error = %v", err)
 	}
 
 	return defaults

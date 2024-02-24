@@ -1,39 +1,37 @@
 package database
 
 import (
+	"math/rand"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
-	_ "github.com/jackc/pgx/stdlib"
 	"github.com/lunn06/video-hosting/internal/config"
 	"github.com/lunn06/video-hosting/internal/models"
 )
 
-func init() {
+func mustTestInit() {
 	config.CFG = config.MustLoad("../../configs/main.yaml")
 	DB = MustCreate(config.CFG)
 }
 
-//TODO: переписать тесты, сделать тесты для всех таблицы
-
 var (
-	checkUserID      = uuid.New().String()
-	checkEmail       = "check@tt.com"
-	checkChannelName = "test"
-	checkPassword    = "1234"
-	checkTime        = time.Now()
+	checkUserId      uint32 = 0
+	checkEmail              = "check@tt.com"
+	checkChannelName        = "test"
+	checkPassword           = "1234"
+	checkTime               = time.Now()
 
 	testUser = models.User{
-		Id:               checkUserID,
+		Id:               checkUserId,
 		Email:            checkEmail,
 		ChannelName:      checkChannelName,
 		Password:         checkPassword,
 		RegistrationTime: checkTime,
 	}
 
-	checkVideoId           = uuid.New().String()
+	checkVideoUuid         = uuid.New()
 	checkTitle             = "Test Title"
 	checkLocalization      = "ru_RU"
 	checkUploadTime        = time.Now()
@@ -42,21 +40,26 @@ var (
 	checkViewsCount   uint = 10000
 
 	testVideo = models.Video{
-		Id:           checkVideoId,
+		Uuid:         checkVideoUuid,
 		Title:        checkTitle,
 		Localization: checkLocalization,
-		UploadDate:   checkUploadTime,
+		UploadTime:   checkUploadTime,
 		FilePath:     checkFilePath,
 		LikesCount:   checkLikesCount,
 		ViewsCount:   checkViewsCount,
 	}
 
-	insertUserRequest = `INSERT INTO users VALUES (
+	testInsertUserRequest = `INSERT INTO users VALUES (
 		:id, :email, :channel_name, :password, :registration_time
-	) ON CONFLICT (id, email) DO NOTHING`
+		)`
+
+	testInsertVideoRequest = `INSERT INTO videos VALUES (
+		:uuid, :title, :localization, :upload_time, :file_path, :likes_count, :views_count
+		)`
 )
 
 func TestMustCreate(t *testing.T) {
+	mustTestInit()
 	want := testUser
 
 	defer func() {
@@ -66,37 +69,39 @@ func TestMustCreate(t *testing.T) {
 		}
 	}()
 
-	tx := DB.MustBegin()
-	if _, err := tx.Exec(
-		"INSERT INTO users VALUES ($1, $2, $3, $4, $5)",
-		checkUserID, checkEmail, checkChannelName, checkPassword, checkTime,
-	); err != nil {
-		t.Errorf("Error on INSERT %v VALUE in users TABLE: %v", checkUserID, err)
-		return
-	}
-
-	if err := tx.Commit(); err != nil {
-		t.Errorf("Error on COMMIT in users TABLE: %v", err)
-		return
-	}
-
-	defer func() {
-		if _, err := DB.Exec("DELETE FROM users WHERE id=$1", checkUserID); err != nil {
-			t.Errorf("DELETE Error: %v. FIX THE DB MANUALY!", err)
+	t.Run("MustCreate() Test", func(t *testing.T) {
+		tx := DB.MustBegin()
+		if _, err := tx.Exec(
+			"INSERT INTO users VALUES ($1, $2, $3, $4, $5)",
+			checkUserId, checkEmail, checkChannelName, checkPassword, checkTime,
+		); err != nil {
+			t.Errorf("INSERT test values in users TABLE error = %v", err)
 			return
 		}
-	}()
 
-	user := models.User{}
+		if err := tx.Commit(); err != nil {
+			t.Errorf("Error on COMMIT in users TABLE: %v", err)
+			return
+		}
 
-	if err := DB.Get(&user, "SELECT * FROM users WHERE id=$1", checkUserID); err != nil {
-		t.Errorf("Error on db.Get: %v", err)
-		return
-	}
+		defer func() {
+			if _, err := DB.Exec("DELETE FROM users WHERE email=$1", checkEmail); err != nil {
+				t.Errorf("DELETE Error: %v. FIX THE DB MANUALY!", err)
+				return
+			}
+		}()
 
-	if !userEqual(user, want) {
-		t.Errorf("SELECT Error: db.Get() = %v, want = %v", user, want)
-	}
+		user := models.User{}
+
+		if err := DB.Get(&user, "SELECT * FROM users WHERE email=$1", checkEmail); err != nil {
+			t.Errorf("Error on db.Get: %v", err)
+			return
+		}
+
+		if !userEqual(user, want) {
+			t.Errorf("SELECT Error: db.Get() = %v, want = %v", user, want)
+		}
+	})
 }
 
 func normalize(tm time.Time) (time.Time, error) {
@@ -108,6 +113,13 @@ func normalize(tm time.Time) (time.Time, error) {
 func userEqual(created, want models.User) bool {
 	created.RegistrationTime, _ = normalize(created.RegistrationTime)
 	want.RegistrationTime, _ = normalize(want.RegistrationTime)
+
+	return reflect.DeepEqual(created, want)
+}
+
+func videoEqual(created, want models.Video) bool {
+	created.UploadTime, _ = normalize(created.UploadTime)
+	want.UploadTime, _ = normalize(want.UploadTime)
 
 	return reflect.DeepEqual(created, want)
 }
@@ -124,7 +136,7 @@ func Test_getPgAddress(t *testing.T) {
 		want string
 	}{
 		{
-			"getPgAdressTest",
+			"getPgAddress() Test",
 			args{cfg},
 			"postgresql://db_user:db_password@pgsql.com:5432/db_name",
 		},
@@ -139,17 +151,21 @@ func Test_getPgAddress(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	_, err := DB.NamedExec(insertUserRequest, testUser)
+	mustTestInit()
+
+	randomUUID := rand.Uint32()
+	_, err := DB.NamedExec(testInsertUserRequest, testUser)
 	if err != nil {
-		t.Errorf("Error on TestGetUser: can't insert testUser manualy: %v", err)
+		t.Errorf("TestGetUser() error: can't insert testUser manualy = %v", err)
 		return
 	}
+
 	defer func() {
 		DB.MustExec("DELETE FROM users WHERE id=$1", testUser.Id)
 	}()
 
 	type args struct {
-		id string
+		id uint32
 	}
 	tests := []struct {
 		name    string
@@ -159,45 +175,57 @@ func TestGetUser(t *testing.T) {
 	}{
 		{
 			"GetUser() Test",
-			args{checkUserID},
+			args{checkUserId},
 			&testUser,
 			false,
 		},
 		{
 			"GetUser() Test Error",
-			args{uuid.New().String()},
-			&testUser,
+			args{randomUUID},
+			nil,
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := GetUser(tt.args.id)
+
+			//DB.MustExec("DELETE FROM users WHERE id=$1", testUser.Uuid)
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetUser() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+			if tt.want == nil && got != nil {
+				t.Errorf("GetUser() got = %v, want %v", got, tt.want)
+				return
+			}
+			if tt.want == nil && got == nil {
+				return
+			}
 			if !userEqual(*got, *tt.want) {
 				t.Errorf("GetUser() got = %v, want %v", got, tt.want)
+			}
+			if r := recover(); r != nil {
+				DB.MustExec("DELETE FROM users WHERE id=$1", testUser.Id)
 			}
 		})
 	}
 }
 
 func TestGetVideo(t *testing.T) {
-	_, err := DB.NamedExec(
-		"INSERT INTO videos VALUES (:id, :title, :localization, :upload_time, :file_path, :likes_count, :views_count)",
-		testVideo,
-	)
+	mustTestInit()
+
+	_, err := DB.NamedExec(testInsertVideoRequest, testVideo)
 	if err != nil {
 		t.Errorf("Error on TestGetVideo: can't insert testVideo manualy")
 		return
 	}
 	defer func() {
-		DB.MustExec("DELETE FROM videos WHERE id=$1", testVideo.Id)
+		DB.MustExec("DELETE FROM videos WHERE uuid=$1", testVideo.Uuid)
 	}()
 	type args struct {
-		id string
+		id uuid.UUID
 	}
 	tests := []struct {
 		name    string
@@ -207,14 +235,14 @@ func TestGetVideo(t *testing.T) {
 	}{
 		{
 			"GetVideo() Test",
-			args{checkVideoId},
+			args{checkVideoUuid},
 			&testVideo,
 			false,
 		},
 		{
 			"GetVideo() Test Error",
-			args{uuid.New().String()},
-			&testVideo,
+			args{uuid.New()},
+			nil,
 			true,
 		},
 	}
@@ -225,8 +253,111 @@ func TestGetVideo(t *testing.T) {
 				t.Errorf("GetVideo() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if tt.want == nil && got != nil {
 				t.Errorf("GetVideo() got = %v, want %v", got, tt.want)
+				return
+			}
+			if tt.want == nil && got == nil {
+				return
+			}
+			if !videoEqual(*got, *tt.want) {
+				t.Errorf("GetVideo() got = %v, want %v", got, tt.want)
+			}
+			if r := recover(); r != nil {
+				DB.MustExec("DELETE FROM videos WHERE uuid=$1", testVideo.Uuid)
+			}
+		})
+	}
+}
+
+func TestInsertUser(t *testing.T) {
+	mustTestInit()
+
+	insertUser := models.User{
+		Id:    uint32(rand.Int31()),
+		Email: "insert@mail.ru",
+	}
+
+	_, err := DB.NamedExec(testInsertUserRequest, testUser)
+	if err != nil {
+		t.Errorf("Error on TestInsertUser: can't insert testUser manualy: %v", err)
+		return
+	}
+
+	defer func() {
+		DB.MustExec("DELETE FROM users WHERE email=$1 OR email=$2", testUser.Email, insertUser.Email)
+	}()
+
+	type args struct {
+		user models.User
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			"InsertUser() Test",
+			args{insertUser},
+			false,
+		},
+		{
+			"InsertUser() Test Error",
+			args{testUser},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := InsertUser(tt.args.user); (err != nil) != tt.wantErr {
+				t.Errorf("InsertUser() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if r := recover(); r != nil {
+				DB.MustExec("DELETE FROM users WHERE email=$1 OR email=$2", testUser.Email, insertUser.Email)
+			}
+		})
+	}
+}
+
+func TestInsertVideo(t *testing.T) {
+	mustTestInit()
+
+	insertVideo := models.Video{
+		Uuid:  uuid.New(),
+		Title: "Insert Title",
+	}
+
+	_, err := DB.NamedExec(testInsertVideoRequest, testVideo)
+	if err != nil {
+		t.Errorf("Error on TestInsertVideo: can't insert testVideo manualy: %v", err)
+		return
+	}
+
+	defer func() {
+		DB.MustExec("DELETE FROM videos WHERE title=$1 OR title=$2", testVideo.Title, insertVideo.Title)
+	}()
+
+	type args struct {
+		video models.Video
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			"InsertVideo() Test",
+			args{insertVideo},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := InsertVideo(tt.args.video); (err != nil) != tt.wantErr {
+				t.Errorf("InsertVideo() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if r := recover(); r != nil {
+				DB.MustExec("DELETE FROM videos WHERE title=$1 OR title=$2", testVideo.Title, insertVideo.Title)
 			}
 		})
 	}

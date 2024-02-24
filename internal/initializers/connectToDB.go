@@ -12,8 +12,7 @@ func ConnectToDB() {
 
 	databaseDefaults := config.MustLoadDatabaseDefaults("configs/database_defaults.yaml")
 
-	tx := database.DB.MustBegin()
-	_, err := tx.NamedExec(
+	_, err := database.DB.NamedExec(
 		`INSERT INTO roles VALUES (
 			:id, :name, :can_remove_users, :can_remove_others_videos
 		) ON CONFLICT (id) DO NOTHING `,

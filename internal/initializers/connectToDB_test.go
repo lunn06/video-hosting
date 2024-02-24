@@ -1,8 +1,13 @@
 package initializers
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/lunn06/video-hosting/internal/config"
+)
 
 func TestConnectToDB(t *testing.T) {
+	config.CFG = config.MustLoad("../../configs/main.yaml")
 	tests := []struct {
 		name string
 	}{

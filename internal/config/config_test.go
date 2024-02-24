@@ -54,9 +54,24 @@ func TestMustLoadDatabaseDefaults(t *testing.T) {
 			args{"../../configs/database_defaults.yaml"},
 			DatabaseDefaults{
 				[]models.Role{
-					{1, "user", false, false},
-					{2, "moderator", false, true},
-					{3, "admin", true, true},
+					{
+						Id:                    1,
+						Name:                  "user",
+						CanRemoveUsers:        false,
+						CanRemoveOthersVideos: false,
+					},
+					{
+						Id:                    2,
+						Name:                  "moderator",
+						CanRemoveUsers:        false,
+						CanRemoveOthersVideos: true,
+					},
+					{
+						Id:                    3,
+						Name:                  "admin",
+						CanRemoveUsers:        true,
+						CanRemoveOthersVideos: true,
+					},
 				},
 			},
 		},
