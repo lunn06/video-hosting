@@ -40,7 +40,7 @@ func Authorization(c *gin.Context) {
 		})
 		return
 	}
-	if len(body.Password) > 255 || body.Password == "" {
+	if len(body.Password) > 72 || body.Password == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid password size",
 		})
