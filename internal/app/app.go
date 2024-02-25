@@ -4,13 +4,15 @@ import (
 	"log"
 
 	"github.com/lunn06/video-hosting/internal/config"
-	"github.com/lunn06/video-hosting/internal/initializers"
+	"github.com/lunn06/video-hosting/internal/database"
 	"github.com/lunn06/video-hosting/internal/services"
 )
 
 func init() {
-	initializers.ParseConfig()
-	initializers.ConnectToDB()
+	config.Init()
+	database.Init()
+	//initializers.ParseConfig()
+	//initializers.ConnectToDB()
 }
 
 func Run() {

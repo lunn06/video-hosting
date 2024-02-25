@@ -2,48 +2,58 @@ package models
 
 var Schema = `
 CREATE TABLE IF NOT EXISTS users (
-     id TEXT PRIMARY KEY NOT NULL,
-     email TEXT UNIQUE NOT NULL,
-     channel_name TEXT NOT NULL,
-     password TEXT NOT NULL,
-     registration_time TIMESTAMP NOT NULL
+	id SERIAL PRIMARY KEY,
+	email TEXT UNIQUE NOT NULL,
+	channel_name TEXT UNIQUE NOT NULL,
+	password TEXT NOT NULL,
+	registration_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS jwt_tokens (
+	uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	token TEXT UNIQUE,
+	creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS users_tokens (
+	user_id INTEGER UNIQUE REFERENCES users(id),
+	token_uuid UUID UNIQUE REFERENCES jwt_tokens(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS roles (
-     id SERIAL PRIMARY KEY,
-     name TEXT UNIQUE NOT NULL,
-     can_remove_users BOOL NOT NULL,
-     can_remove_others_videos BOOL NOT NULL
+	id INTEGER PRIMARY KEY,
+	name TEXT UNIQUE NOT NULL,
+	can_remove_users BOOL NOT NULL,
+	can_remove_others_videos BOOL NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users_roles (
-	user_id TEXT REFERENCES users(id),
-	role_id SERIAL REFERENCES roles(id)
+	user_id INTEGER UNIQUE REFERENCES users(id),
+	role_id INTEGER REFERENCES roles(id)
 );
 
 CREATE TABLE IF NOT EXISTS videos (
-	id TEXT PRIMARY KEY,
+	uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	title TEXT NOT NULL,
-	localization TEXT,
-	upload_time TIMESTAMP NOT NULL ,
-	file_path TEXT NOT NULL,
-	likes_count SERIAL,
-	views_count SERIAL NOT NULL
+	localization TEXT NOT NULL,
+	upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	file_path TEXT UNIQUE NOT NULL,
+	likes_count INTEGER NOT NULL,
+	views_count INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users_videos (
-	video_id TEXT REFERENCES videos(id),
-	user_id TEXT REFERENCES users(id)
+	user_id SERIAL REFERENCES users(id),
+	video_uuid UUID UNIQUE REFERENCES videos(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS tags (
-    id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
+	id SERIAL PRIMARY KEY,
+	name TEXT UNIQUE NOT NULL
 );
 
-
 CREATE TABLE IF NOT EXISTS videos_tags (
-    video_id TEXT REFERENCES videos(id),
-    tag_id SERIAL REFERENCES tags(id)
+	video_uuid UUID REFERENCES videos(uuid),
+	tag_id SERIAL REFERENCES tags(id)
 );
 `
