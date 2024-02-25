@@ -19,6 +19,7 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY configs/main.yaml ./configs/
+COPY configs/database_defaults.yaml ./configs/
 COPY --from=build /video-hosting .
 
 CMD ["./video-hosting"]
