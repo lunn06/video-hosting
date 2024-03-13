@@ -2,7 +2,6 @@ package rest
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lunn06/video-hosting/internal/database"
@@ -56,50 +55,22 @@ func Registration(c *gin.Context) {
 		})
 		return
 	}
-	tx := database.DB.MustBegin()
-	var lastUserID uint32
-	err = tx.Get(&lastUserID, "SELECT id FROM users ORDER BY id DESC LIMIT 1")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Error on the server. Please, try again later",
 		})
 		return
 	}
-	newUserID := lastUserID + 1
-	usr := models.User{
-		Id:               newUserID,
-		Email:            body.Email,
-		ChannelName:      body.ChannelName,
-		Password:         string(hash),
-		RegistrationTime: time.Now(),
+	user := models.User{
+		Email:       body.Email,
+		ChannelName: body.ChannelName,
+		Password:    string(hash),
 	}
-	defer tx.Commit()
-	result, err := tx.Exec("INSERT INTO users (id, email, channel_name, password, registration_time) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING", usr.Id, usr.Email, usr.ChannelName, usr.Password, usr.RegistrationTime)
+	err = database.InsertUser(user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Error on the server. Please, try again later",
+		c.JSON(http.StatusConflict, gin.H{
+			"error": "email or channel already been use",
 		})
-		return
-	}
-	if rowsAffected, err := result.RowsAffected(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Error on the server. Please, try again later",
-		})
-		return
-	} else {
-		if rowsAffected == 0 {
-			c.JSON(http.StatusConflict, gin.H{
-				"error": "This email or channel has already been use",
-			})
-			return
-		}
-	}
-	result, err = tx.Exec("INSERT INTO users_roles (user_id, role_id) VALUES ($1, $2)", usr.Id, 1)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Error on the server. Please, try again later",
-		})
-		tx.MustExec("DELETE FROM users WHERE id=$1", usr.Id)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

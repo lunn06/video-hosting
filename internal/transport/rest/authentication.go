@@ -34,26 +34,26 @@ func Authorization(c *gin.Context) {
 		return
 	}
 	if len(body.Email) > 255 || body.Email == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			// неправильно набран email
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": "Email entered incorrectly, because it exceeds the character limit or backwards",
 		})
 		return
 	}
 	if len(body.Password) > 72 || body.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": "Invalid password size",
 		})
 		return
 	}
-	user := models.User{}
-	if err := database.DB.Get(&user, "SELECT * FROM users WHERE email=$1", body.Email); err != nil {
+	user := &models.User{}
+	user, err := database.GetUser(body.Email)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid email or password",
 		})
 		return
 	}
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid email or password",
@@ -61,9 +61,10 @@ func Authorization(c *gin.Context) {
 		return
 	}
 	var jwtSecretKey = []byte(config.CFG.JWTSecretKey)
+
 	payload := jwt.MapClaims{
 		"sub": user.Email,
-		"exp": time.Now().Add(time.Hour * 30).Unix(),
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	t, err := token.SignedString(jwtSecretKey)
@@ -73,23 +74,14 @@ func Authorization(c *gin.Context) {
 		})
 		return
 	}
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(
-		// cookie name
-		"Authorization",
-		// cookie value
-		t,
-		// cookie lifetime
-		3600*24*30,
-		// path on the server to which the cookies are applied, path applies to the current one
-		"",
-		// domain for which cookies are valid are applied to the current one
-		"",
-		// cookies are sent via http
-		false,
-		// accessible only to server requests and not accessible to JS reading and modification
-		true)
+	err = database.InsertToken(user.Id, t)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid to insert token",
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Authorization was successful",
+		"access_token": t,
 	})
 }

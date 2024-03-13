@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/stdlib"
@@ -82,14 +83,21 @@ func InsertUser(user models.User) error {
 	if err := checkDBConnection(); err != nil {
 		return err
 	}
-
-	_, err := DB.NamedExec(insertUserRequest, user)
-
+	tx := DB.MustBegin()
+	lastInsertIndex := 0
+	err := tx.QueryRow("INSERT INTO users (email, channel_name, password) VALUES($1, $2, $3) RETURNING id", user.Email, user.ChannelName, user.Password).Scan(&lastInsertIndex)
 	if err != nil {
+		slog.Error("error in insert user", err)
 		return err
 	}
 
-	return nil
+	_, err = tx.Exec("INSERT INTO users_roles (user_id, role_id) VALUES ($1, $2)", lastInsertIndex, 1)
+	if err != nil {
+		slog.Error("error when adding user role", err)
+		return err
+	}
+	tx.Commit()
+	return err
 }
 
 func InsertVideo(video models.Video) error {
@@ -103,17 +111,37 @@ func InsertVideo(video models.Video) error {
 		return err
 	}
 
-	return nil
+	return err
+}
+func InsertToken(id uint32, jwtToken string) error {
+	if err := checkDBConnection(); err != nil {
+		return err
+	}
+	tx := DB.MustBegin()
+	var tempUUID string
+	err := tx.QueryRow("INSERT INTO jwt_tokens (token) VALUES ($1) RETURNING uuid", jwtToken).Scan(&tempUUID)
+	if err != nil {
+		slog.Error("error in insert token", err)
+		return err
+	}
+
+	_, err = tx.Exec("INSERT INTO users_tokens (user_id, token_uuid) VALUES ($1, $2)", id, tempUUID)
+	if err != nil {
+		slog.Error("error in insert users_token", err)
+		return err
+	}
+	tx.Commit()
+	return err
 }
 
-func GetUser(id uint32) (*models.User, error) {
+func GetUser(email string) (*models.User, error) {
 	if err := checkDBConnection(); err != nil {
 		return nil, err
 	}
 
 	var user models.User
 
-	err := DB.Get(&user, "SELECT * FROM users WHERE id=$1", id)
+	err := DB.Get(&user, "SELECT * FROM users WHERE email=$1", email)
 
 	if err != nil {
 		return nil, err

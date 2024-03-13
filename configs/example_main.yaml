@@ -7,3 +7,4 @@ database:
   name: "db_name"
   password: "db_password"
   ssl_mode: "disable"
+jwt_secret_key: "test"
