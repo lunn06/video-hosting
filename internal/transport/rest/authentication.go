@@ -14,18 +14,23 @@ import (
 
 // @BasePath /
 
-// Authorization godoc
-// @Summary авторизирует пользователя
+// Authentication godoc
+// @Summary authenticates the user
 // @Schemes application/json
 // @Description accepts json sent by the user as input and authorize it
 // @Tags authorization
 // @Accept json
 // @Produce json
 // @Param input body models.LoginRequest true "account info"
-// @Success 200 "message: Authorization was successful"
-// @Failure 400
+// @Success 200 "message: Authentication was successful"
+// @Failure 400 "error: Failed to read body"
+// @Failure 422 "error: Email entered incorrectly, because it exceeds the character limit or backwards"
+// @Failure 422 "error: Invalid password size"
+// @Failure 403 "error: Invalid email or password"
+// @Failure 500 "error: Invalid to create token"
+// @Failure 400 "error: Invalid to insert token"
 // @Router /login [post]
-func Authorization(c *gin.Context) {
+func Authentication(c *gin.Context) {
 	body := models.LoginRequest{}
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -48,14 +53,14 @@ func Authorization(c *gin.Context) {
 	user := &models.User{}
 	user, err := database.GetUser(body.Email)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusForbidden, gin.H{
 			"error": "Invalid email or password",
 		})
 		return
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusForbidden, gin.H{
 			"error": "Invalid email or password",
 		})
 		return
@@ -69,7 +74,7 @@ func Authorization(c *gin.Context) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	t, err := token.SignedString(jwtSecretKey)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Invalid to create token",
 		})
 		return
@@ -82,6 +87,6 @@ func Authorization(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"access_token": t,
+		"message": "Authentication was successful",
 	})
 }

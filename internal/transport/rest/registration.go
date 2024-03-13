@@ -20,7 +20,12 @@ import (
 // @Produce json
 // @Param input body models.RegisterRequest true "account info"
 // @Success 200 "message: Registration was successful"
-// @Failure 400
+// @Failure 400 "error: Failed to read body"
+// @Failure 422 "error: Failed create email, because it exceeds the character limit or backwards"
+// @Failure 422 "error: Failed create channel_name, because it exceeds the character limit or backwards"
+// @Failure 422 "error: Failed create password, because it exceeds the character limit or backwards"
+// @Failure 500 "error: Failed to hash password. Please, try again later"
+// @Failure 409 "error: email or channel already been use"
 // @Router /registration [post]
 func Registration(c *gin.Context) {
 	body := models.RegisterRequest{}
@@ -49,12 +54,6 @@ func Registration(c *gin.Context) {
 		return
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to hash password. Please, try again later",
-		})
-		return
-	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Error on the server. Please, try again later",

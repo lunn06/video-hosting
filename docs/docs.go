@@ -27,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "authorization"
                 ],
-                "summary": "авторизирует пользователя",
+                "summary": "authenticates the user",
                 "parameters": [
                     {
                         "description": "account info",
@@ -41,10 +41,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "message: Authorization was successful"
+                        "description": "message: Authentication was successful"
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "error: Invalid to insert token"
+                    },
+                    "403": {
+                        "description": "error: Invalid email or password"
+                    },
+                    "422": {
+                        "description": "error: Invalid password size"
+                    },
+                    "500": {
+                        "description": "error: Invalid to create token"
                     }
                 }
             }
@@ -101,7 +110,16 @@ const docTemplate = `{
                         "description": "message: Registration was successful"
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "error: Failed to read body"
+                    },
+                    "409": {
+                        "description": "error: email or channel already been use"
+                    },
+                    "422": {
+                        "description": "error: Failed create password, because it exceeds the character limit or backwards"
+                    },
+                    "500": {
+                        "description": "error: Failed to hash password. Please, try again later"
                     }
                 }
             }

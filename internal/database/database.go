@@ -113,7 +113,7 @@ func InsertVideo(video models.Video) error {
 
 	return err
 }
-func InsertToken(id uint32, jwtToken string) error {
+func InsertToken(userId uint32, jwtToken string) error {
 	if err := checkDBConnection(); err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func InsertToken(id uint32, jwtToken string) error {
 		return err
 	}
 
-	_, err = tx.Exec("INSERT INTO users_tokens (user_id, token_uuid) VALUES ($1, $2)", id, tempUUID)
+	_, err = tx.Exec("INSERT INTO users_tokens (user_id, token_uuid) VALUES ($1, $2)", userId, tempUUID)
 	if err != nil {
 		slog.Error("error in insert users_token", err)
 		return err
