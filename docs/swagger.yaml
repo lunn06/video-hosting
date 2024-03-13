@@ -1,6 +1,54 @@
+definitions:
+  models.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.RegisterRequest:
+    properties:
+      channel_name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+    type: object
 info:
   contact: {}
+  description: API Server for video-hosting application
+  title: Video-hosting API
+  version: "0.1"
 paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: accepts json sent by the user as input and authorize it
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Authentication was successful'
+        "400":
+          description: 'error: Invalid to insert token'
+        "403":
+          description: 'error: Invalid email or password'
+        "422":
+          description: 'error: Invalid password size'
+        "500":
+          description: 'error: Invalid to create token'
+      summary: authenticates the user
+      tags:
+      - authorization
   /ping:
     get:
       consumes:
@@ -16,4 +64,33 @@ paths:
       summary: ping example
       tags:
       - example
+  /registration:
+    post:
+      consumes:
+      - application/json
+      description: accepts json sent by the user as input and registers it
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Registration was successful'
+        "400":
+          description: 'error: Failed to read body'
+        "409":
+          description: 'error: email or channel already been use'
+        "422":
+          description: 'error: Failed create password, because it exceeds the character
+            limit or backwards'
+        "500":
+          description: 'error: Failed to hash password. Please, try again later'
+      summary: registers a user
+      tags:
+      - registration
 swagger: "2.0"

@@ -28,6 +28,7 @@ func TestMustLoad(t *testing.T) {
 					"db_password",
 					"disable",
 				},
+				"test",
 			},
 		},
 	}

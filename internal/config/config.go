@@ -11,8 +11,9 @@ import (
 var CFG Config
 
 type Config struct {
-	HTTPServer `yaml:"http_server"`
-	Database   `yaml:"database"`
+	HTTPServer   `yaml:"http_server"`
+	Database     `yaml:"database"`
+	JWTSecretKey string `yaml:"jwt_secret_key"`
 }
 
 type HTTPServer struct {

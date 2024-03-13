@@ -8,7 +8,8 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.GET("/ping", rest.Ping)
-
+	r.POST("/registration", rest.Registration)
+	r.POST("/login", rest.Authentication)
 	SetupDocs(r)
 
 	return r
