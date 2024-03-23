@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS jwt_tokens (
-	uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	uuid UUID PRIMARY KEY UNIQUE DEFAULT gen_random_uuid(),
 	token TEXT UNIQUE,
 	creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

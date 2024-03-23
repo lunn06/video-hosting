@@ -26,7 +26,7 @@ import (
 // @Failure 422 "error: Failed create password, because it exceeds the character limit or backwards"
 // @Failure 500 "error: Failed to hash password. Please, try again later"
 // @Failure 409 "error: email or channel already been use"
-// @Router /registration [post]
+// @Router /api/auth/registration [post]
 func Registration(c *gin.Context) {
 	body := models.RegisterRequest{}
 	if c.Bind(&body) != nil {

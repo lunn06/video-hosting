@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/login": {
+        "/api/auth/login": {
             "post": {
                 "description": "accepts json sent by the user as input and authorize it",
                 "consumes": [
@@ -58,30 +58,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/ping": {
-            "get": {
-                "description": "do ping",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "text/plain"
-                ],
-                "tags": [
-                    "example"
-                ],
-                "summary": "ping example",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "plain"
-                        }
-                    }
-                }
-            }
-        },
-        "/registration": {
+        "/api/auth/registration": {
             "post": {
                 "description": "accepts json sent by the user as input and registers it",
                 "consumes": [
@@ -120,6 +97,29 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "error: Failed to hash password. Please, try again later"
+                    }
+                }
+            }
+        },
+        "/ping": {
+            "get": {
+                "description": "do ping",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "example"
+                ],
+                "summary": "ping example",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
                     }
                 }
             }

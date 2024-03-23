@@ -21,7 +21,7 @@ info:
   title: Video-hosting API
   version: "0.1"
 paths:
-  /login:
+  /api/auth/login:
     post:
       consumes:
       - application/json
@@ -49,22 +49,7 @@ paths:
       summary: authenticates the user
       tags:
       - authorization
-  /ping:
-    get:
-      consumes:
-      - application/json
-      description: do ping
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: plain
-      summary: ping example
-      tags:
-      - example
-  /registration:
+  /api/auth/registration:
     post:
       consumes:
       - application/json
@@ -93,4 +78,19 @@ paths:
       summary: registers a user
       tags:
       - registration
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+      summary: ping example
+      tags:
+      - example
 swagger: "2.0"
