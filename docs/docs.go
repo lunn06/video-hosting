@@ -58,6 +58,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/auth/refresh": {
+            "post": {
+                "description": "accept json and refresh user refresh and access tokens",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "authorization"
+                ],
+                "summary": "refresh user's tokens",
+                "parameters": [
+                    {
+                        "description": "account info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message: RefreshTokens was successful"
+                    },
+                    "401": {
+                        "description": "error: Invalid to get refresh token from cookie"
+                    },
+                    "500": {
+                        "description": "error: Invalid to create token"
+                    }
+                }
+            }
+        },
         "/api/auth/registration": {
             "post": {
                 "description": "accepts json sent by the user as input and registers it",

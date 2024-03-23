@@ -22,19 +22,17 @@ import (
 // @Produce json
 // @Param input body models.LoginRequest true "account info"
 // @Success 200 "message: RefreshTokens was successful"
-// @Failure 400 "error: Failed to read body"
-// @Failure 422 "error: Email entered incorrectly, because it exceeds the character limit or backwards"
-// @Failure 422 "error: Invalid password size"
-// @Failure 403 "error: Invalid email or password"
+// @Failure 401 "error: Invalid to get refresh token from cookie"
+// @Failure 500 "error: Invalid to pop token"
+// @Failure 500 "error: Invalid to insert token"
 // @Failure 500 "error: Invalid to create token"
-// @Failure 400 "error: Invalid to insert token"
-// @Router /api/auth/login [post]
+// @Router /api/auth/refresh [post]
 func RefreshTokens(c *gin.Context) {
 	refreshCookie, err := c.Request.Cookie("refreshToken")
 	if err != nil {
 		slog.Error(fmt.Sprintf("RefreshToken() error = %v, can't fetch refresh cookies", err))
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "InternalServerError, please try again later",
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid to get refresh token from cookie",
 		})
 		return
 	}
@@ -44,14 +42,14 @@ func RefreshTokens(c *gin.Context) {
 	if err != nil {
 		slog.Error(fmt.Sprintf("RefreshToken() error = %v, can't delete or select from db", err))
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "InternalServerError, please try again later",
+			"error": "InternalServerError, please try again later",
 		})
 		return
 	}
 
 	if token.CreationTime.Add(time.Duration(refreshCookie.MaxAge)).Compare(time.Now()) == 1 {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "INVALID_REFRESH_SESSION: refresh token out of life",
+			"error": "INVALID_REFRESH_SESSION: refresh token out of life",
 		})
 		return
 	}
@@ -93,7 +91,7 @@ func RefreshTokens(c *gin.Context) {
 	)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":      "Authentication was successful",
+		"message":      "RefreshToken was successful",
 		"accessToken":  accessToken,
 		"refreshToken": refreshToken,
 	})

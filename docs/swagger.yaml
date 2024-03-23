@@ -49,6 +49,30 @@ paths:
       summary: authenticates the user
       tags:
       - authorization
+  /api/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: accept json and refresh user refresh and access tokens
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: RefreshTokens was successful'
+        "401":
+          description: 'error: Invalid to get refresh token from cookie'
+        "500":
+          description: 'error: Invalid to create token'
+      summary: refresh user's tokens
+      tags:
+      - authorization
   /api/auth/registration:
     post:
       consumes:
