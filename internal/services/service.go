@@ -7,6 +7,7 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
+	r.MaxMultipartMemory = 8 << 20  // 8 MiB
 
 	api := r.Group("/api")
 	{
