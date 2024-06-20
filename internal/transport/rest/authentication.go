@@ -70,20 +70,20 @@ func Authentication(c *gin.Context) {
 		return
 	}
 
-	userRefreshToken, err := database.GetTokenByUser(*user)
-	if err == nil {
-		err = database.UpdateTokenTime(*userRefreshToken)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Server error! Pleas try again later",
-			})
-			return
-		}
+	// _, err = database.GetTokenByUser(*user)
+	// if err != nil {
+	// 	// err = database.UpdateTokenTime(*userRefreshToken)
+	// 	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{
+	// 		"error": "Server error! Pleas try again later",
+	// 	})
+	// 	return
+	// 	// }
 
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Authentication was successful",
-		})
-	}
+	// 	// c.JSON(http.StatusOK, gin.H{
+	// 		// "message": "Authentication was successful",
+	// 	// })
+	// }
 
 	accessToken, refreshToken, err := newTokens(*user)
 	if err != nil {
