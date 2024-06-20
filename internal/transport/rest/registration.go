@@ -65,7 +65,7 @@ func Registration(c *gin.Context) {
 		ChannelName: body.ChannelName,
 		Password:    string(hash),
 	}
-	userID, err := database.InsertUser(user)
+	_, err = database.InsertUser(user)
 	if err != nil {
 		c.JSON(http.StatusConflict, gin.H{
 			"error": "email or channel already been use",
@@ -73,43 +73,43 @@ func Registration(c *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := newTokens(user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Invalid to create token",
-		})
-		return
-	}
+	// accessToken, refreshToken, err := newTokens(user)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{
+	// 		"error": "Invalid to create token",
+	// 	})
+	// 	return
+	// }
 
-	refreshUUID, err := database.InsertToken(userID, refreshToken)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid to insert token",
-		})
-		return
-	}
+	// refreshUUID, err := database.InsertToken(userID, refreshToken)
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"error": "Invalid to insert token",
+	// 	})
+	// 	return
+	// }
 
-	jwtCookie := http.Cookie{
-		Name:     "refreshToken",
-		Value:    refreshUUID,
-		MaxAge:   refreshLife,
-		Path:     "/api/auth",
-		HttpOnly: true,
-	}
+	// jwtCookie := http.Cookie{
+	// 	Name:     "refreshToken",
+	// 	Value:    refreshUUID,
+	// 	MaxAge:   refreshLife,
+	// 	Path:     "/api/auth",
+	// 	HttpOnly: true,
+	// }
 
-	c.SetCookie(
-		jwtCookie.Name,
-		jwtCookie.Value,
-		jwtCookie.MaxAge,
-		jwtCookie.Path,
-		jwtCookie.Domain,
-		jwtCookie.Secure,
-		jwtCookie.HttpOnly,
-	)
+	// c.SetCookie(
+	// 	jwtCookie.Name,
+	// 	jwtCookie.Value,
+	// 	jwtCookie.MaxAge,
+	// 	jwtCookie.Path,
+	// 	jwtCookie.Domain,
+	// 	jwtCookie.Secure,
+	// 	jwtCookie.HttpOnly,
+	// )
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":      "Registration was successful",
-		"accessToken":  accessToken,
-		"refreshToken": refreshUUID,
+		// "accessToken":  accessToken,
+		// "refreshToken": refreshUUID,
 	})
 }
