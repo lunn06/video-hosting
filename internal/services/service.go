@@ -15,10 +15,10 @@ func SetupRouter() *gin.Engine {
 			auth.POST("/registration", rest.Registration)
 			auth.POST("/login", rest.Authentication)
 			auth.POST("/refresh", rest.RefreshTokens)
+			auth.POST("/upload", rest.Upload)
+			auth.GET("/ping", AuthMiddleware(), rest.Ping)
 		}
 	}
-
-	r.GET("/ping", AuthMiddleware(), rest.Ping)
 
 	SetupDocs(r)
 	return r
