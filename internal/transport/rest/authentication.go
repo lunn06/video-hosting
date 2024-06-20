@@ -83,7 +83,6 @@ func Authentication(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Authentication was successful",
 		})
-		return
 	}
 
 	accessToken, refreshToken, err := newTokens(*user)
