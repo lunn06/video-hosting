@@ -116,26 +116,29 @@ func InsertVideo(video models.Video) error {
 
 	return err
 }
-func InsertToken(userId uint32, jwtToken string) error {
+func InsertToken(userId uint32, jwtToken string) (string, error) {
 	if err := checkDBConnection(); err != nil {
 		slog.Error("error in insert users_token", err)
-		return err
+		return "", err
 	}
 	tx := DB.MustBegin()
+
 	var tempUUID string
 	err := tx.QueryRow("INSERT INTO jwt_tokens (token) VALUES ($1) RETURNING uuid", jwtToken).Scan(&tempUUID)
+
 	if err != nil {
 		slog.Error("error in insert token", err)
-		return err
+		return "", err
 	}
 
 	_, err = tx.Exec("INSERT INTO users_tokens (user_id, token_uuid) VALUES ($1, $2)", userId, tempUUID)
 	if err != nil {
 		slog.Error("error in insert users_token", err)
-		return err
+		return "", err
 	}
 	tx.Commit()
-	return err
+
+	return tempUUID, err
 }
 
 func UpdateTokenTime(token models.JwtToken) error {
@@ -214,20 +217,20 @@ func GetToken(givenToken string) (*models.JwtToken, error) {
 	return &token, nil
 }
 
-func PopToken(givenToken string) (*models.JwtToken, error) {
+func PopToken(tokenUUID string) (*models.JwtToken, error) {
 	if err := checkDBConnection(); err != nil {
 		return nil, err
 	}
 
 	var token models.JwtToken
 
-	err := DB.Get(&token, "SELECT * FROM jwt_tokens WHERE token=$1", givenToken)
+	err := DB.Get(&token, "SELECT * FROM jwt_tokens WHERE uuid=$1", tokenUUID)
 	if err != nil {
 		slog.Error(fmt.Sprintf("PopToken() error = %v, can't select", err))
 		return nil, err
 	}
 
-	_, err = DB.Exec("DELETE FROM jwt_tokens WHERE token=$1", givenToken)
+	_, err = DB.Exec("DELETE FROM jwt_tokens WHERE uuid=$1", tokenUUID)
 	if err != nil {
 		slog.Error(fmt.Sprintf("PopToken() error = %v, can't delete token", err))
 		return nil, err

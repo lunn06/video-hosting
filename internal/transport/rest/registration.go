@@ -72,9 +72,9 @@ func Registration(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Registration was successful",
-	})
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"message": "Registration was successful",
+	// })
 
 	accessToken, refreshToken, err := newTokens(user)
 	if err != nil {
@@ -84,7 +84,7 @@ func Registration(c *gin.Context) {
 		return
 	}
 
-	err = database.InsertToken(user.Id, refreshToken)
+	refreshUUID, err := database.InsertToken(user.Id, refreshToken)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid to insert token",
@@ -94,7 +94,7 @@ func Registration(c *gin.Context) {
 
 	jwtCookie := http.Cookie{
 		Name:     "refreshToken",
-		Value:    refreshToken,
+		Value:    refreshUUID,
 		MaxAge:   refreshLife,
 		Path:     "/api/auth",
 		HttpOnly: true,
@@ -111,8 +111,8 @@ func Registration(c *gin.Context) {
 	)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":      "Authentication was successful",
+		"message":      "Registration was successful",
 		"accessToken":  accessToken,
-		"refreshToken": refreshToken,
+		"refreshToken": refreshUUID,
 	})
 }

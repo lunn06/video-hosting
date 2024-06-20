@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -28,7 +27,7 @@ import (
 // @Failure 500 "error: Invalid to create token"
 // @Router /api/auth/refresh [post]
 func RefreshTokens(c *gin.Context) {
-	refreshCookie, err := c.Request.Cookie("refreshToken")
+	refreshUUID, err := c.Cookie("refreshToken")
 	if err != nil {
 		slog.Error(fmt.Sprintf("RefreshToken() error = %v, can't fetch refresh cookies", err))
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -36,9 +35,8 @@ func RefreshTokens(c *gin.Context) {
 		})
 		return
 	}
-	refreshToken, _ := url.QueryUnescape(refreshCookie.Value)
 
-	token, err := database.PopToken(refreshToken)
+	token, err := database.PopToken(refreshUUID)
 	if err != nil {
 		slog.Error(fmt.Sprintf("RefreshToken() error = %v, can't delete or select from db", err))
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -47,7 +45,7 @@ func RefreshTokens(c *gin.Context) {
 		return
 	}
 
-	if token.CreationTime.Add(time.Duration(refreshCookie.MaxAge)).Compare(time.Now()) == 1 {
+	if token.CreationTime.Add(time.Duration(refreshLife)).Compare(time.Now()) < 1 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "INVALID_REFRESH_SESSION: refresh token out of life",
 		})
@@ -64,7 +62,7 @@ func RefreshTokens(c *gin.Context) {
 		return
 	}
 
-	err = database.InsertToken(user.Id, refreshToken)
+	newRefreshUUID, err := database.InsertToken(user.Id, refreshToken)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid to insert token",
@@ -74,7 +72,7 @@ func RefreshTokens(c *gin.Context) {
 
 	jwtCookie := http.Cookie{
 		Name:     "refreshToken",
-		Value:    refreshToken,
+		Value:    newRefreshUUID,
 		MaxAge:   refreshLife,
 		Path:     "/api/auth",
 		HttpOnly: true,
@@ -93,6 +91,6 @@ func RefreshTokens(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":      "RefreshToken was successful",
 		"accessToken":  accessToken,
-		"refreshToken": refreshToken,
+		"refreshToken": newRefreshUUID,
 	})
 }

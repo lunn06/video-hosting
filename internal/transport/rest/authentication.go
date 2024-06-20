@@ -94,7 +94,7 @@ func Authentication(c *gin.Context) {
 		return
 	}
 
-	err = database.InsertToken(user.Id, refreshToken)
+	refreshUUID, err := database.InsertToken(user.Id, refreshToken)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid to insert token",
@@ -104,7 +104,7 @@ func Authentication(c *gin.Context) {
 
 	jwtCookie := http.Cookie{
 		Name:     "refreshToken",
-		Value:    refreshToken,
+		Value:    refreshUUID,
 		MaxAge:   refreshLife,
 		Path:     "/api/auth",
 		HttpOnly: true,
@@ -123,7 +123,7 @@ func Authentication(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":      "Authentication was successful",
 		"accessToken":  accessToken,
-		"refreshToken": refreshToken,
+		"refreshToken": refreshUUID,
 	})
 }
 
