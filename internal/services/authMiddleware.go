@@ -38,7 +38,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		user, err := database.GetUserByRefreshToken(token.Token)
+		user, err := database.GetUserByRefreshToken(refreshUUID)
 		if user == nil {
 			slog.Error("AuthMiddleware() error = %v", err)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
