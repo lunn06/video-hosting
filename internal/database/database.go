@@ -201,14 +201,14 @@ func GetUserByRefreshToken(token string) (*models.User, error) {
 	return &user, nil
 }
 
-func GetToken(givenToken string) (*models.JwtToken, error) {
+func GetToken(tokenUUID string) (*models.JwtToken, error) {
 	if err := checkDBConnection(); err != nil {
 		return nil, err
 	}
 
 	var token models.JwtToken
 
-	err := DB.Get(&token, "SELECT * FROM jwt_tokens WHERE token=$1", givenToken)
+	err := DB.Get(&token, "SELECT * FROM jwt_tokens WHERE uuid=$1", tokenUUID)
 	if err != nil {
 		slog.Error(fmt.Sprintf("GetToken() error = %v, can't select", err))
 		return nil, err
