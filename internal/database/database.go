@@ -80,26 +80,26 @@ func checkDBConnection() error {
 	return nil
 }
 
-func InsertUser(user models.User) error {
+func InsertUser(user models.User) (uint32, error) {
 	if err := checkDBConnection(); err != nil {
 		slog.Error("error in insert users_token", err)
-		return err
+		return 0, err
 	}
 	tx := DB.MustBegin()
-	lastInsertIndex := 0
+	var lastInsertIndex uint32
 	err := tx.QueryRow("INSERT INTO users (email, channel_name, password) VALUES($1, $2, $3) RETURNING id", user.Email, user.ChannelName, user.Password).Scan(&lastInsertIndex)
 	if err != nil {
 		slog.Error("error in insert user", err)
-		return err
+		return 0, err
 	}
 
 	_, err = tx.Exec("INSERT INTO users_roles (user_id, role_id) VALUES ($1, $2)", lastInsertIndex, 1)
 	if err != nil {
 		slog.Error("error when adding user role", err)
-		return err
+		return 0, err
 	}
 	tx.Commit()
-	return err
+	return lastInsertIndex, err
 }
 
 func InsertVideo(video models.Video) error {
