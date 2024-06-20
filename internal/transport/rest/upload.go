@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
