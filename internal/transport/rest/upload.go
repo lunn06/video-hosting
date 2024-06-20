@@ -14,6 +14,8 @@ func Upload(c *gin.Context) {
 
 	c.Header("Access-Control-Allow-Origin", "*")
 
+	log.Println(file.Size, file)
+
 	// Upload the file to specific dst.
 	c.SaveUploadedFile(file, "./videos")
 
