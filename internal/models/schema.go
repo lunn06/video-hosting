@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS jwt_tokens (
 );
 
 CREATE TABLE IF NOT EXISTS users_tokens (
-	user_id INTEGER UNIQUE REFERENCES users(id),
+	user_id INTEGER REFERENCES users(id),
 	token_uuid UUID UNIQUE REFERENCES jwt_tokens(uuid)
 );
 
