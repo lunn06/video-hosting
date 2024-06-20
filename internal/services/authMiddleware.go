@@ -25,6 +25,11 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		refreshToken, _ := url.QueryUnescape(cookie.Value)
 		token, err := database.GetToken(refreshToken)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "INVALID_REFRESH_SESSION: refresh token out of life",
+			})
+		}
 
 		if token.CreationTime.Add(time.Duration(cookie.MaxAge)).Compare(time.Now()) == 1 {
 			slog.Error("AuthMiddleware() error = %v", err)
