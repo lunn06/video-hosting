@@ -12,6 +12,8 @@ func Upload(c *gin.Context) {
 	file, _ := c.FormFile("file")
 	log.Println(file.Filename)
 
+	c.Header("Access-Control-Allow-Origin", "*")
+
 	// Upload the file to specific dst.
 	c.SaveUploadedFile(file, "./videos")
 
