@@ -185,9 +185,7 @@ func GetUserByRefreshToken(token string) (*models.User, error) {
 
 	getUserByRefreshTokenDBRequest := `
 		SELECT * FROM users WHERE id=(
-			SELECT user_id FROM users_tokens WHERE token_uuid=(
-			    SELECT token_uuid FROM jwt_tokens WHERE token=$1
-			)
+			SELECT user_id FROM users_tokens WHERE token_uuid=$1
 		)
 	`
 
