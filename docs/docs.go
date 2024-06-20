@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/login": {
+        "/api/auth/login": {
             "post": {
                 "description": "accepts json sent by the user as input and authorize it",
                 "consumes": [
@@ -58,30 +58,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/ping": {
-            "get": {
-                "description": "do ping",
+        "/api/auth/refresh": {
+            "post": {
+                "description": "accept json and refresh user refresh and access tokens",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
-                    "example"
+                    "authorization"
                 ],
-                "summary": "ping example",
+                "summary": "refresh user's tokens",
+                "parameters": [
+                    {
+                        "description": "account info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "plain"
-                        }
+                        "description": "message: RefreshTokens was successful"
+                    },
+                    "401": {
+                        "description": "error: Invalid to get refresh token from cookie"
+                    },
+                    "500": {
+                        "description": "error: Invalid to create token"
                     }
                 }
             }
         },
-        "/registration": {
+        "/api/auth/registration": {
             "post": {
                 "description": "accepts json sent by the user as input and registers it",
                 "consumes": [
@@ -120,6 +134,29 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "error: Failed to hash password. Please, try again later"
+                    }
+                }
+            }
+        },
+        "/ping": {
+            "get": {
+                "description": "do ping",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "example"
+                ],
+                "summary": "ping example",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
                     }
                 }
             }

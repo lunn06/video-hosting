@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"time"
 
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/stdlib"
@@ -74,13 +75,14 @@ func getPgAddress(cfg config.Config) string {
 
 func checkDBConnection() error {
 	if DB == nil {
-		return errors.New("GetUser() Error: no DB connection")
+		return errors.New("no DB connection")
 	}
 	return nil
 }
 
 func InsertUser(user models.User) error {
 	if err := checkDBConnection(); err != nil {
+		slog.Error("error in insert users_token", err)
 		return err
 	}
 	tx := DB.MustBegin()
@@ -102,6 +104,7 @@ func InsertUser(user models.User) error {
 
 func InsertVideo(video models.Video) error {
 	if err := checkDBConnection(); err != nil {
+		slog.Error("error in insert users_token", err)
 		return err
 	}
 
@@ -113,25 +116,127 @@ func InsertVideo(video models.Video) error {
 
 	return err
 }
-func InsertToken(userId uint32, jwtToken string) error {
+func InsertToken(userId uint32, jwtToken string) (string, error) {
 	if err := checkDBConnection(); err != nil {
-		return err
+		slog.Error("error in insert users_token", err)
+		return "", err
 	}
 	tx := DB.MustBegin()
+
 	var tempUUID string
 	err := tx.QueryRow("INSERT INTO jwt_tokens (token) VALUES ($1) RETURNING uuid", jwtToken).Scan(&tempUUID)
+
 	if err != nil {
 		slog.Error("error in insert token", err)
-		return err
+		return "", err
 	}
 
 	_, err = tx.Exec("INSERT INTO users_tokens (user_id, token_uuid) VALUES ($1, $2)", userId, tempUUID)
 	if err != nil {
 		slog.Error("error in insert users_token", err)
-		return err
+		return "", err
 	}
 	tx.Commit()
-	return err
+
+	return tempUUID, err
+}
+
+func UpdateTokenTime(token models.JwtToken) error {
+	if err := checkDBConnection(); err != nil {
+		slog.Error("checkDBConnection() error = %v", err)
+		return err
+	}
+
+	_, err := DB.Exec("UPDATE jwt_tokens SET creation_time=$1 WHERE uuid=$2", time.Now(), token.Uuid)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetTokenByUser(user models.User) (*models.JwtToken, error) {
+	if err := checkDBConnection(); err != nil {
+		slog.Error("checkDBConnection() error = %v", err)
+		return nil, err
+	}
+
+	getTokenByUserRequest := `
+		SELECT * FROM jwt_tokens WHERE uuid=(
+		    SELECT token_uuid FROM users_tokens WHERE user_id=$1
+		)
+	`
+
+	var token models.JwtToken
+	err := DB.Get(&token, getTokenByUserRequest, user.Id)
+	if err != nil {
+		slog.Error("error on getting token from jwt_tokens table")
+		return nil, err
+	}
+
+	return &token, nil
+}
+
+func GetUserByRefreshToken(token string) (*models.User, error) {
+	if err := checkDBConnection(); err != nil {
+		slog.Error("checkDBConnection() error = %v", err)
+		return nil, err
+	}
+
+	getUserByRefreshTokenDBRequest := `
+		SELECT * FROM users WHERE id=(
+			SELECT user_id FROM users_tokens WHERE token_uuid=(
+			    SELECT token_uuid FROM jwt_tokens WHERE token=$1
+			)
+		)
+	`
+
+	var user models.User
+	err := DB.Get(&user, getUserByRefreshTokenDBRequest, token)
+	if err != nil {
+		slog.Error("GetUserByRefreshToken() error = %v, can't get tokenId from DB")
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func GetToken(givenToken string) (*models.JwtToken, error) {
+	if err := checkDBConnection(); err != nil {
+		return nil, err
+	}
+
+	var token models.JwtToken
+
+	err := DB.Get(&token, "SELECT * FROM jwt_tokens WHERE token=$1", givenToken)
+	if err != nil {
+		slog.Error(fmt.Sprintf("GetToken() error = %v, can't select", err))
+		return nil, err
+	}
+
+	return &token, nil
+}
+
+func PopToken(tokenUUID string) (*models.JwtToken, error) {
+	if err := checkDBConnection(); err != nil {
+		return nil, err
+	}
+
+	var token models.JwtToken
+
+	err := DB.Get(&token, "SELECT * FROM jwt_tokens WHERE uuid=$1", tokenUUID)
+	if err != nil {
+		slog.Error(fmt.Sprintf("PopToken() error = %v, can't select", err))
+		return nil, err
+	}
+
+	_, err = DB.Exec("DELETE FROM jwt_tokens WHERE uuid=$1", tokenUUID)
+	if err != nil {
+		slog.Error(fmt.Sprintf("PopToken() error = %v, can't delete token", err))
+		return nil, err
+	}
+
+	return &token, nil
 }
 
 func GetUser(email string) (*models.User, error) {

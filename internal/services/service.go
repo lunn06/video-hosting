@@ -7,10 +7,19 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-	r.GET("/ping", rest.Ping)
-	r.POST("/registration", rest.Registration)
-	r.POST("/login", rest.Authentication)
-	SetupDocs(r)
 
+	api := r.Group("/api")
+	{
+		auth := api.Group("/auth")
+		{
+			auth.POST("/registration", rest.Registration)
+			auth.POST("/login", rest.Authentication)
+			auth.POST("/refresh", rest.RefreshTokens)
+		}
+	}
+
+	r.GET("/ping", AuthMiddleware(), rest.Ping)
+
+	SetupDocs(r)
 	return r
 }

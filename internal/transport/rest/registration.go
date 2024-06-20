@@ -26,7 +26,7 @@ import (
 // @Failure 422 "error: Failed create password, because it exceeds the character limit or backwards"
 // @Failure 500 "error: Failed to hash password. Please, try again later"
 // @Failure 409 "error: email or channel already been use"
-// @Router /registration [post]
+// @Router /api/auth/registration [post]
 func Registration(c *gin.Context) {
 	body := models.RegisterRequest{}
 	if c.Bind(&body) != nil {
@@ -72,7 +72,47 @@ func Registration(c *gin.Context) {
 		})
 		return
 	}
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"message": "Registration was successful",
+	// })
+
+	accessToken, refreshToken, err := newTokens(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Invalid to create token",
+		})
+		return
+	}
+
+	refreshUUID, err := database.InsertToken(user.Id, refreshToken)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid to insert token",
+		})
+		return
+	}
+
+	jwtCookie := http.Cookie{
+		Name:     "refreshToken",
+		Value:    refreshUUID,
+		MaxAge:   refreshLife,
+		Path:     "/api/auth",
+		HttpOnly: true,
+	}
+
+	c.SetCookie(
+		jwtCookie.Name,
+		jwtCookie.Value,
+		jwtCookie.MaxAge,
+		jwtCookie.Path,
+		jwtCookie.Domain,
+		jwtCookie.Secure,
+		jwtCookie.HttpOnly,
+	)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Registration was successful",
+		"message":      "Registration was successful",
+		"accessToken":  accessToken,
+		"refreshToken": refreshUUID,
 	})
 }

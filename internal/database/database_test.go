@@ -51,11 +51,11 @@ var (
 
 	testInsertUserRequest = `INSERT INTO users VALUES (
 		:id, :email, :channel_name, :password, :registration_time
-		)`
+	)`
 
 	testInsertVideoRequest = `INSERT INTO videos VALUES (
 		:uuid, :title, :localization, :upload_time, :file_path, :likes_count, :views_count
-		)`
+	)`
 )
 
 func TestMustCreate(t *testing.T) {
@@ -153,7 +153,7 @@ func Test_getPgAddress(t *testing.T) {
 func TestGetUser(t *testing.T) {
 	mustTestInit()
 
-	randomUUID := rand.Uint32()
+	invalidEmail := "@it.invalid"
 	_, err := DB.NamedExec(testInsertUserRequest, testUser)
 	if err != nil {
 		t.Errorf("TestGetUser() error: can't insert testUser manualy = %v", err)
@@ -165,7 +165,7 @@ func TestGetUser(t *testing.T) {
 	}()
 
 	type args struct {
-		id uint32
+		email string
 	}
 	tests := []struct {
 		name    string
@@ -175,20 +175,20 @@ func TestGetUser(t *testing.T) {
 	}{
 		{
 			"GetUser() Test",
-			args{checkUserId},
+			args{checkEmail},
 			&testUser,
 			false,
 		},
 		{
 			"GetUser() Test Error",
-			args{randomUUID},
+			args{invalidEmail},
 			nil,
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetUser(tt.args.id)
+			got, err := GetUser(tt.args.email)
 
 			//DB.MustExec("DELETE FROM users WHERE id=$1", testUser.Uuid)
 
