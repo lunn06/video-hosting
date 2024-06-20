@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	accessLife  = 60 * 30
-	refreshLife = 3600 * 24
+	AccessLife  = 60 * 30
+	RefreshLife = 3600 * 24
 )
 
 // @BasePath /auth/api/
@@ -104,7 +104,7 @@ func Authentication(c *gin.Context) {
 	jwtCookie := http.Cookie{
 		Name:     "refreshToken",
 		Value:    refreshUUID,
-		MaxAge:   refreshLife,
+		MaxAge:   RefreshLife,
 		Path:     "/api/auth",
 		HttpOnly: true,
 	}
@@ -131,7 +131,7 @@ func newTokens(user models.User) (string, string, error) {
 
 	accessPayload := jwt.MapClaims{
 		"email": user.Email,
-		"exp":   accessLife,
+		"exp":   AccessLife,
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessPayload)
@@ -142,7 +142,7 @@ func newTokens(user models.User) (string, string, error) {
 
 	refreshPayload := jwt.MapClaims{
 		"sub": rand.Int(),
-		"exp": refreshLife,
+		"exp": RefreshLife,
 	}
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshPayload)

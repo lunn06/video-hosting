@@ -45,7 +45,7 @@ func RefreshTokens(c *gin.Context) {
 		return
 	}
 
-	if token.CreationTime.Add(time.Duration(refreshLife)).Compare(time.Now()) < 1 {
+	if token.CreationTime.Add(time.Duration(RefreshLife)).Compare(time.Now()) < 1 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "INVALID_REFRESH_SESSION: refresh token out of life",
 		})
@@ -73,7 +73,7 @@ func RefreshTokens(c *gin.Context) {
 	jwtCookie := http.Cookie{
 		Name:     "refreshToken",
 		Value:    newRefreshUUID,
-		MaxAge:   refreshLife,
+		MaxAge:   RefreshLife,
 		Path:     "/api/auth",
 		HttpOnly: true,
 	}
