@@ -17,7 +17,7 @@ func Upload(c *gin.Context) {
 	log.Println(file.Size, file)
 
 	// Upload the file to specific dst.
-	c.SaveUploadedFile(file, "./videos")
+	c.SaveUploadedFile(file, "./videos/" + file.Filename)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Uploade successful",
