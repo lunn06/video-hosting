@@ -65,16 +65,13 @@ func Registration(c *gin.Context) {
 		ChannelName: body.ChannelName,
 		Password:    string(hash),
 	}
-	err = database.InsertUser(user)
+	userID, err := database.InsertUser(user)
 	if err != nil {
 		c.JSON(http.StatusConflict, gin.H{
 			"error": "email or channel already been use",
 		})
 		return
 	}
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"message": "Registration was successful",
-	// })
 
 	accessToken, refreshToken, err := newTokens(user)
 	if err != nil {
@@ -84,7 +81,7 @@ func Registration(c *gin.Context) {
 		return
 	}
 
-	refreshUUID, err := database.InsertToken(user.Id, refreshToken)
+	refreshUUID, err := database.InsertToken(userID, refreshToken)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid to insert token",
