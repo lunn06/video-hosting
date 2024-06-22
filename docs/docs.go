@@ -58,6 +58,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/auth/ping": {
+            "get": {
+                "description": "do ping",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "example"
+                ],
+                "summary": "ping example",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "plain"
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/refresh": {
             "post": {
                 "description": "accept json and refresh user refresh and access tokens",
@@ -138,25 +161,22 @@ const docTemplate = `{
                 }
             }
         },
-        "/ping": {
-            "get": {
-                "description": "do ping",
+        "/api/auth/upload": {
+            "post": {
+                "description": "accepts file sent by the user as input and upload it",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
-                    "example"
+                    "uploading"
                 ],
-                "summary": "ping example",
+                "summary": "upload a FILE",
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "plain"
-                        }
+                        "description": "message: Uploade was successful"
                     }
                 }
             }

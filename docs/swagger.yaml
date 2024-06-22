@@ -49,6 +49,21 @@ paths:
       summary: authenticates the user
       tags:
       - authorization
+  /api/auth/ping:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: plain
+      summary: ping example
+      tags:
+      - example
   /api/auth/refresh:
     post:
       consumes:
@@ -102,19 +117,17 @@ paths:
       summary: registers a user
       tags:
       - registration
-  /ping:
-    get:
+  /api/auth/upload:
+    post:
       consumes:
       - application/json
-      description: do ping
+      description: accepts file sent by the user as input and upload it
       produces:
-      - text/plain
+      - application/json
       responses:
         "200":
-          description: OK
-          schema:
-            type: plain
-      summary: ping example
+          description: 'message: Uploade was successful'
+      summary: upload a FILE
       tags:
-      - example
+      - uploading
 swagger: "2.0"

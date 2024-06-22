@@ -108,7 +108,7 @@ func Registration(c *gin.Context) {
 	// )
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":      "Registration was successful",
+		"message": "Registration was successful",
 		// "accessToken":  accessToken,
 		// "refreshToken": refreshUUID,
 	})

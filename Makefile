@@ -27,6 +27,6 @@ deploy:
 	@docker compose -f deployments/docker-compose.yaml up -d
 .PHONY:deploy
 
-swagger: vet
+swagger:
 	@swag init -g ./cmd/app/main.go -o docs
 .PHONY:generate-docs

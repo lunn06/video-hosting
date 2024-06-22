@@ -16,7 +16,7 @@ import (
 // @Accept json
 // @Produce plain
 // @Success 200 plain pong
-// @Router /ping [get]
+// @Router /api/auth/ping [get]
 func Ping(c *gin.Context) {
 	c.String(http.StatusOK, "pong")
 }
