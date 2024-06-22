@@ -9,7 +9,7 @@ import (
 
 // @BasePath /
 
-// Uploading godoc
+// Upload godoc
 // @Summary upload a FILE
 // @Schemes application/json
 // @Description accepts file sent by the user as input and upload it
