@@ -7,6 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @BasePath /
+
+// Uploading godoc
+// @Summary upload a FILE
+// @Schemes application/json
+// @Description accepts file sent by the user as input and upload it
+// @Tags uploading
+// @Accept file
+// @Produce json
+// @Success 200 "message: Uploade was successful"
+// @Router /api/auth/upload [post]
 func Upload(c *gin.Context) {
 	// single file
 	file, _ := c.FormFile("file")
